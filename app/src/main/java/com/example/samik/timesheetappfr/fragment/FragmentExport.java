@@ -42,6 +42,8 @@ public class FragmentExport extends Fragment implements View.OnClickListener {
 
     // Хранит данные выбранного периода отправки пользовательских данных
     private HashMap<String, Integer> userDataMap;
+    // Хранит последние данные введенные польхователем в поля
+    private HashMap<String, String> lastUserEmailData;
     // View elements
     private EditText emailEt;
     private EditText subjectEt;
@@ -85,9 +87,13 @@ public class FragmentExport extends Fragment implements View.OnClickListener {
 
     private void updateUI() {
         BaseDataMaster baseDataMaster = BaseDataMaster.getDataMaster(fContext);
-        HashMap<String, String> lastUserEmailData = new HashMap<>();
+        if (lastUserEmailData == null) {
+            lastUserEmailData = baseDataMaster.getEmailData();
+        }
+
         // Если пользовватель уже вводил данные, автоматически зополняем поля
         if (!baseDataMaster.getEmailData().isEmpty()) {
+            lastUserEmailData = baseDataMaster.getEmailData();
             emailEt.setText(lastUserEmailData.get(BaseDataHelper.User.EMAIL));
             subjectEt.setText(lastUserEmailData.get(BaseDataHelper.User.SUBJECT));
             messageEt.setText(lastUserEmailData.get(BaseDataHelper.User.MESSAGE));
@@ -117,44 +123,30 @@ public class FragmentExport extends Fragment implements View.OnClickListener {
         }
     }
 
-    /**
-     * TODO
-     */
     private void sendUserData() {
         BaseDataMaster baseDataMaster = BaseDataMaster.getDataMaster(fContext);
-        HashMap<String, String> lastUserEmailData = new HashMap<>();
-
-        try {
-            if (!baseDataMaster.getEmailData().isEmpty()) {
-                lastUserEmailData = baseDataMaster.getEmailData();
-                latestEmail = lastUserEmailData.get(BaseDataHelper.User.EMAIL);
-                latestSubject = lastUserEmailData.get(BaseDataHelper.User.SUBJECT);
-                latestMessage = lastUserEmailData.get(BaseDataHelper.User.MESSAGE);
-            } else {
-                // Сохраняем данные введенные пользователем в переменные
-                latestEmail = emailEt.getText().toString();
-                latestSubject = subjectEt.getText().toString();
-                latestMessage = messageEt.getText().toString();
-
-                // Если пользователь менял последние сохраненные данные, обновзяем их
-                if (!latestEmail.equals(lastUserEmailData.get(BaseDataHelper.User.EMAIL))
-                        || !latestSubject.equals(lastUserEmailData.get(BaseDataHelper.User.SUBJECT))
-                        || !latestMessage.equals(lastUserEmailData.get(BaseDataHelper.User.MESSAGE))) {
-
-                    // Сохраняем новые данные в локальную базу данных
-                    lastUserEmailData.put(BaseDataHelper.User.EMAIL, emailEt.getText().toString());
-                    lastUserEmailData.put(BaseDataHelper.User.SUBJECT, subjectEt.getText().toString());
-                    lastUserEmailData.put(BaseDataHelper.User.MESSAGE, messageEt.getText().toString());
-                    baseDataMaster.insertEmailData(lastUserEmailData);
-                }
-
-            }
-        } catch (
-                NullPointerException e)
-
-        {
-            e.printStackTrace();
+        if (lastUserEmailData == null || lastUserEmailData.size() == 0) {
+            lastUserEmailData = baseDataMaster.getEmailData();
         }
+
+        // Сохраняем данные введенные пользователем в переменные
+        latestEmail = emailEt.getText().toString();
+        latestSubject = subjectEt.getText().toString();
+        latestMessage = messageEt.getText().toString();
+
+        // Если пользователь менял последние сохраненные данные, обновзяем их
+        if (!latestEmail.equals(lastUserEmailData.get(BaseDataHelper.User.EMAIL))
+                || !latestSubject.equals(lastUserEmailData.get(BaseDataHelper.User.SUBJECT))
+                || !latestMessage.equals(lastUserEmailData.get(BaseDataHelper.User.MESSAGE))) {
+
+            // Сохраняем новые данные в локальную базу данных
+            lastUserEmailData.put(BaseDataHelper.User.EMAIL, emailEt.getText().toString());
+            lastUserEmailData.put(BaseDataHelper.User.SUBJECT, subjectEt.getText().toString());
+            lastUserEmailData.put(BaseDataHelper.User.MESSAGE, messageEt.getText().toString());
+
+            baseDataMaster.insertEmailData(lastUserEmailData);
+        }
+
 
         // Создаем интент с экшеном на отправку
         Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
@@ -165,10 +157,7 @@ public class FragmentExport extends Fragment implements View.OnClickListener {
         emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, latestMessage);
         /* Отправляем на выбор!*/
         fContext.startActivity(Intent.createChooser(emailIntent, "Send mail..."));
-
-
     }
-
 
     /**
      * Говимся к показу виджета календаря польхователю и обрвботки данныъ

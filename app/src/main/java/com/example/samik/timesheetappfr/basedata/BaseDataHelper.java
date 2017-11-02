@@ -3,7 +3,6 @@ package com.example.samik.timesheetappfr.basedata;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.hardware.usb.UsbRequest;
 import android.provider.BaseColumns;
 
 public class BaseDataHelper extends SQLiteOpenHelper {
@@ -13,14 +12,13 @@ public class BaseDataHelper extends SQLiteOpenHelper {
 
     public static class User implements BaseColumns {
         public static final String TABLE_NAME = "latest_data";
-        public static final String EMAIL = " email ";
-        public static final String SUBJECT = " subject ";
-        public static final String MESSAGE = " message ";
+        public static final String EMAIL = "email";
+        public static final String SUBJECT = "subject";
+        public static final String MESSAGE = "message";
     }
 
     static String SCRIPT_CREATE_TBL_MAIN = " CREATE TABLE " +
             User.TABLE_NAME + " ( " +
-            User._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             User.EMAIL + " TEXT, " +
             User.SUBJECT + " TEXT, " +
             User.MESSAGE + " TEXT " +

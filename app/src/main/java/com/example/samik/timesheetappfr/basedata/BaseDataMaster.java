@@ -30,18 +30,19 @@ public class BaseDataMaster {
     }
 
     public long insertEmailData(HashMap<String, String> emailData) {
+        deleteTable();
         ContentValues contentValues = new ContentValues();
-        contentValues.put(BaseDataHelper.User.EMAIL, emailData.containsKey(BaseDataHelper.User.EMAIL));
-        contentValues.put(BaseDataHelper.User.SUBJECT, emailData.containsKey(BaseDataHelper.User.SUBJECT));
-        contentValues.put(BaseDataHelper.User.MESSAGE, emailData.containsKey(BaseDataHelper.User.MESSAGE));
+        contentValues.put(BaseDataHelper.User.EMAIL, emailData.get(BaseDataHelper.User.EMAIL));
+        contentValues.put(BaseDataHelper.User.SUBJECT, emailData.get(BaseDataHelper.User.SUBJECT));
+        contentValues.put(BaseDataHelper.User.MESSAGE, emailData.get(BaseDataHelper.User.MESSAGE));
 
         Log.d(LOG_TAG, "insertData");
         return database.insert(BaseDataHelper.User.TABLE_NAME, null, contentValues);
     }
 
-//    private void deleteItem(String itemKey) {
-//        database.delete(BaseDataHelper.User.TABLE_NAME, BaseDataHelper.User.MAIN_KEY + "='" + itemKey + "'", null);
-//    }
+    private void deleteTable() {
+        database.delete(BaseDataHelper.User.TABLE_NAME,null, null);
+    }
 
     public HashMap<String, String> getEmailData() {
         String query = "SELECT " + BaseDataHelper.User.EMAIL + ", " +
